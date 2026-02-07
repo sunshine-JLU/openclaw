@@ -153,6 +153,9 @@ export function validateAll(
   value: unknown,
   validators: Array<(val: unknown) => ValidationResult>,
 ): ValidationResult {
+  if (validators.length === 0) {
+    return { valid: true, value };
+  }
   for (const validator of validators) {
     const result = validator(value);
     if (!result.valid) {
@@ -161,9 +164,8 @@ export function validateAll(
     // Update value for next validator (in case it transforms it)
     value = result.value;
   }
-  // If we have validators, use the last result's value; otherwise return the original
-  const lastResult = validators[validators.length - 1]?.(value);
-  return lastResult?.valid ? { valid: true, value: lastResult.value } : { valid: true, value };
+  // All validators passed; return the final transformed value
+  return { valid: true, value };
 }
 
 /**
